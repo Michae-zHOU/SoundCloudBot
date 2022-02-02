@@ -18,6 +18,7 @@ DEFAULT_URL = 'https://soundcloud.com/decentral-mike/basshead-mix2'
 PLAY_BUTTON_XPATH = '//*[@id="content"]/div/div[2]/div/div[2]/div[2]/div/div/div[1]'
 VOLUME_BUTTON_XPATH = '//*[@id="app"]/div[4]/section/div/div[3]/div[5]/div/div[2]/button'
 PLAY_TAB = '//*[@id="content"]/div/div[3]/div[1]/div/div[1]/div/div/div[2]/ul/li[1]/span/span[1]'
+STABLE_THRESH_HOLD = 10
 
 class SoundCloudBot:
     def __init__(self, count, url):
@@ -26,6 +27,7 @@ class SoundCloudBot:
         self.stop_time = 0
         self.prev_play_count = 0
         self.curr_play_count = 0
+        self.stable_count = 0
 
     def run(self):
         for cur_run in range(self.count):
@@ -37,9 +39,9 @@ class SoundCloudBot:
             self.__wait_till_ready()
             self.__mute()
             self.__play()
-            self.__pause()
             self.print_play_count()
             self.__wait_for_sc_server_to_update()
+            self.__pause()
             self.__close()
 
     def __print_run(self, cur_run):
@@ -74,11 +76,6 @@ class SoundCloudBot:
         self.play_button = self.driver.find_element(By.XPATH, PLAY_BUTTON_XPATH)
         self.play_button.click()
         time.sleep(PLAY_TIME)
-
-    def __pause(self):
-        self.pause_button = self.driver.find_element(By.XPATH, PLAY_BUTTON_XPATH)
-        self.pause_button.click()
-        time.sleep(PAUSE_TIME)
     
     def print_play_count(self):
         play_count_tab = self.driver.find_element(By.XPATH, PLAY_TAB)
@@ -87,9 +84,21 @@ class SoundCloudBot:
     
     def __wait_for_sc_server_to_update(self):
         if self.prev_play_count == self.curr_play_count:
-            self.stop_time += 4
+            self.stop_time += 1
+            self.stable_count = 0
             time.sleep(self.stop_time)
+        else:
+            self.stable_count += 1
+
+        if self.stable_count >= STABLE_THRESH_HOLD and self.stop_time > 0:
+            self.stop_time -= 1
+
         self.prev_play_count = self.curr_play_count
+
+    def __pause(self):
+        self.pause_button = self.driver.find_element(By.XPATH, PLAY_BUTTON_XPATH)
+        self.pause_button.click()
+        time.sleep(PAUSE_TIME)
 
     def __close(self):
         self.driver.quit()
