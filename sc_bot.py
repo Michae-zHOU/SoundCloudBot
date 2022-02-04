@@ -1,6 +1,7 @@
 import sys
 import time
 from helper import *
+from constant import *
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,16 +10,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-
-DEFAULT_RUN = 1
-LOADING_TIMEOUT = 20
-PLAY_TIME = 5
-PAUSE_TIME = 2
-DEFAULT_URL = 'https://soundcloud.com/decentral-mike/basshead-mix2'
-PLAY_BUTTON_XPATH = '//*[@id="content"]/div/div[2]/div/div[2]/div[2]/div/div/div[1]'
-VOLUME_BUTTON_XPATH = '//*[@id="app"]/div[4]/section/div/div[3]/div[5]/div/div[2]/button'
-PLAY_TAB = '//*[@id="content"]/div/div[3]/div[1]/div/div[1]/div/div/div[2]/ul/li[1]/span/span[1]'
-STABLE_THRESH_HOLD = 10
 
 class SoundCloudBot:
     def __init__(self, count, url):
@@ -39,7 +30,7 @@ class SoundCloudBot:
             self.__wait_till_ready()
             self.__mute()
             self.__play()
-            self.print_play_count()
+            self.__print_play_count()
             self.__wait_for_sc_server_to_update()
             self.__pause()
             self.__close()
@@ -77,12 +68,14 @@ class SoundCloudBot:
         self.play_button.click()
         time.sleep(PLAY_TIME)
     
-    def print_play_count(self):
+    def __print_play_count(self):
         play_count_tab = self.driver.find_element(By.XPATH, PLAY_TAB)
         print("Current track played count: " + play_count_tab.text)
         self.curr_play_count = get_number_from_str(play_count_tab.text)
     
     def __wait_for_sc_server_to_update(self):
+        if not ENABLE_WAIT:
+            return
         if self.prev_play_count >= self.curr_play_count:
             self.stop_time += 1
             self.stable_count = 0
