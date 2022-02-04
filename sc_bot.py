@@ -92,7 +92,8 @@ class SoundCloudBot:
 
         if self.stable_count >= STABLE_THRESH_HOLD and self.stop_time > 0:
             self.stop_time -= 1
-
+            
+        print("Play time extends by " + str(self.stop_time) + " seconds.")
         self.prev_play_count = self.curr_play_count
 
     def __pause(self):
