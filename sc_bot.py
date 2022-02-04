@@ -37,7 +37,7 @@ class SoundCloudBot:
     def __print_run(self, cur_run):
             decorater = "=" * 50
             print("\n\n\n")
-            print(decorater + " Current Run: " + str(cur_run) + " " + decorater)
+            print(decorater + " Current Run: " + str(cur_run + 1) + " " + decorater)
 
     def __start(self):
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
