@@ -83,7 +83,7 @@ class SoundCloudBot:
         self.curr_play_count = get_number_from_str(play_count_tab.text)
     
     def __wait_for_sc_server_to_update(self):
-        if self.prev_play_count == self.curr_play_count:
+        if self.prev_play_count >= self.curr_play_count:
             self.stop_time += 1
             self.stable_count = 0
             time.sleep(self.stop_time)
@@ -92,7 +92,7 @@ class SoundCloudBot:
 
         if self.stable_count >= STABLE_THRESH_HOLD and self.stop_time > 0:
             self.stop_time -= 1
-            
+
         print("Play time extends by " + str(self.stop_time) + " seconds.")
         self.prev_play_count = self.curr_play_count
 
